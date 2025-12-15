@@ -77,15 +77,53 @@ const LearnerSubmissions = [
 ];
 
 function getLearnerData(course, ag, submissions) {
-    
 
-    return result;
+   
+
+
+
+
+
+
+    // return result;
 }
 
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
-console.log(result);
+// console.log(result);
 
+for ( i = 0; i < AssignmentGroup.assignments.length; i++){
+    for (let j = 0; j < LearnerSubmissions.length; j++){
+        if(AssignmentGroup.assignments[i].id === LearnerSubmissions[j].assignment_id){
+            const dueDate = AssignmentGroup.assignments[i].due_at;
+            const submittedDate = LearnerSubmissions[j].submission.submitted_at;
+            let todayDate = "2025-01-01";
+
+
+            // CHECKS IF ASSIGNMENT IS DUE
+            if (!(dueDate > todayDate)){
+                if (submittedDate <= dueDate){
+                console.log("On Time", LearnerSubmissions[j].assignment_id, LearnerSubmissions[j].submission.score);
+            }else{
+                // Takes off 10 points for late submissions
+                LearnerSubmissions[j].submission.score -= 10
+                console.log("LATE", LearnerSubmissions[j].assignment_id, LearnerSubmissions[j].submission.score);
+            }
+            }
+
+            
+        }
+    }
+  
+} 
+
+
+
+
+
+//  console.log(AssignmentGroup.assignments[0].id);
+//  console.log(AssignmentGroup.assignments[1].id);
+//  console.log(AssignmentGroup.assignments[2].id);
 
 
 // Example Output
