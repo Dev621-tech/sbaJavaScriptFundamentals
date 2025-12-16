@@ -76,87 +76,98 @@ const LearnerSubmissions = [
     }
 ];
 
-// function getLearnerData(course, ag, submissions) {
-
-   
 
 
 
 
+function getLearnerData(course, ag, submissions) {
+    let learnerScores = {};
+    let score = 0;
 
 
-//     // return result;
-// }
+    try {
 
-// const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+        for (i = 0; i < AssignmentGroup.assignments.length; i++) {
+            for (let j = 0; j < LearnerSubmissions.length; j++) {
 
-let learnerScores = {};
-let score =0;
-
-for ( i = 0; i < AssignmentGroup.assignments.length; i++){
-    for (let j = 0; j < LearnerSubmissions.length; j++){
+                // Matches Assignment ID with Submission ID
+                if (AssignmentGroup.assignments[i].id === LearnerSubmissions[j].assignment_id) {
 
 
-        if(AssignmentGroup.assignments[i].id === LearnerSubmissions[j].assignment_id){
+                    const dueDate = AssignmentGroup.assignments[i].due_at;
+                    const submittedDate = LearnerSubmissions[j].submission.submitted_at;
+                    let todayDate = "2025-01-01";
+                    const submission = LearnerSubmissions[j];
+
+                    if (!submittedDate) {
+                        throw new Error("NO SUBMISSION DATE!")
+                    }
 
 
-            const dueDate = AssignmentGroup.assignments[i].due_at;
-            const submittedDate = LearnerSubmissions[j].submission.submitted_at;
-            let todayDate = "2025-01-01";
-            const submission = LearnerSubmissions[j];
+                    // CHECKS IF ASSIGNMENT IS DUE
+                    if (dueDate > todayDate) {
+                        continue;
+                    }
+                    // IF LATE DEDUCTS 10 POINTS
+                    if (submittedDate > dueDate) {
+                        LearnerSubmissions[j].submission.score -= 10;
+                    }
+
+                    score = LearnerSubmissions[j].submission.score / AssignmentGroup.assignments[i].points_possible;
+
+                    // console.log(`${LearnerSubmissions[j].learner_id} ${score}%`);
 
 
-            // CHECKS IF ASSIGNMENT IS DUE
-            if (dueDate > todayDate){
-                continue;
+                    // creates object based on learner id if there is not one
+                    if (!learnerScores[submission.learner_id]) {
+                        learnerScores[submission.learner_id] = [];
+                    }
+                    // Pushing scores
+                    learnerScores[submission.learner_id].push(score);
+                }
             }
-
-            if (submittedDate > dueDate){
-                LearnerSubmissions[j].submission.score -= 10;
-            }
-                
-             score = LearnerSubmissions[j].submission.score / AssignmentGroup.assignments[i].points_possible;
-             
-            // console.log(`${LearnerSubmissions[j].learner_id} ${score}%`);
-            
-            if(!learnerScores[submission.learner_id]){
-            learnerScores[submission.learner_id] = [];
-             }
-             
-            learnerScores[submission.learner_id].push(score);
         }
+        //   console.log(learnerScores);
+        // Loop for averages
+        for (const learnerID in learnerScores) {
+            let sum = 0;
+            const scores = learnerScores[learnerID];
+            // add scores together
+            for (let i = 0; i < scores.length; i++) {
+                sum += scores[i];
+            }
+            // divide by number of scores (they are already percentage based)
+            learnerScores[learnerID].average = sum / scores.length;
+        }
+
+        return learnerScores;
+
+    } catch (error) {
+        throw new Error("❌ Error: " + error.message);
+
     }
 }
-//   console.log(learnerScores);
-    
-for (const learnerID in learnerScores){
-    let sum = 0;
-    const scores = learnerScores[learnerID];
-
-    for (let i = 0; i < scores.length; i++){
-        sum += scores[i];
-    }
-
-    learnerScores[learnerID].average = sum / scores.length;
-}
 
 
 
-console.log(learnerScores);
-            
-    
-        
+const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+
+console.log(result);
 
 
 
-   // learnersScores.push(LearnerSubmissions[j].submission.score);
 
 
+
+
+
+
+
+// learnersScores.push(LearnerSubmissions[j].submission.score);
 
 //  console.log(AssignmentGroup.assignments[0].id);
 //  console.log(AssignmentGroup.assignments[1].id);
 //  console.log(AssignmentGroup.assignments[2].id);
-
 
 // Example Output
 // const result = [
