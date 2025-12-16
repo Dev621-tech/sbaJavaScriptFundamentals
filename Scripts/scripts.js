@@ -76,7 +76,7 @@ const LearnerSubmissions = [
     }
 ];
 
-function getLearnerData(course, ag, submissions) {
+// function getLearnerData(course, ag, submissions) {
 
    
 
@@ -85,47 +85,69 @@ function getLearnerData(course, ag, submissions) {
 
 
 
-    // return result;
-}
+//     // return result;
+// }
 
-const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+// const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
-
+let learnerScores = {};
 let score =0;
 
 for ( i = 0; i < AssignmentGroup.assignments.length; i++){
     for (let j = 0; j < LearnerSubmissions.length; j++){
+
+
         if(AssignmentGroup.assignments[i].id === LearnerSubmissions[j].assignment_id){
+
+
             const dueDate = AssignmentGroup.assignments[i].due_at;
             const submittedDate = LearnerSubmissions[j].submission.submitted_at;
             let todayDate = "2025-01-01";
+            const submission = LearnerSubmissions[j];
 
 
             // CHECKS IF ASSIGNMENT IS DUE
-            if (!(dueDate > todayDate)){
-                if (submittedDate <= dueDate){
-                // console.log("On Time", LearnerSubmissions[j].assignment_id, LearnerSubmissions[j].submission.score);
-            }else{
-                // Takes off 10 points for late submissions
-                LearnerSubmissions[j].submission.score -= 10
-                // console.log("LATE", LearnerSubmissions[j].assignment_id, LearnerSubmissions[j].submission.score);
-            } 
-            let score = (LearnerSubmissions[j].submission.score / AssignmentGroup.assignments[i].points_possible) * 100;
-            console.log(score + "%");
-         }
-                
-                
-                
+            if (dueDate > todayDate){
+                continue;
             }
-               
 
-
+            if (submittedDate > dueDate){
+                LearnerSubmissions[j].submission.score -= 10;
             }
+                
+             score = LearnerSubmissions[j].submission.score / AssignmentGroup.assignments[i].points_possible;
+             
+            // console.log(`${LearnerSubmissions[j].learner_id} ${score}%`);
+            
+            if(!learnerScores[submission.learner_id]){
+            learnerScores[submission.learner_id] = [];
+             }
+             
+            learnerScores[submission.learner_id].push(score);
+        }
+    }
+}
+//   console.log(learnerScores);
     
-        } 
+for (const learnerID in learnerScores){
+    let sum = 0;
+    const scores = learnerScores[learnerID];
 
-//  console.log(learnersScores);
+    for (let i = 0; i < scores.length; i++){
+        sum += scores[i];
+    }
+
+    learnerScores[learnerID].average = sum / scores.length;
+}
+
+
+
+console.log(learnerScores);
+            
+    
         
+
+
 
    // learnersScores.push(LearnerSubmissions[j].submission.score);
 
@@ -151,5 +173,4 @@ for ( i = 0; i < AssignmentGroup.assignments.length; i++){
 //             2: 0.833 // late: (140 - 15) / 150           
 //         }
 //     ];
-
 
